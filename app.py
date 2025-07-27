@@ -1,11 +1,11 @@
 # ==============================================================================
-#  SMARTPAPER.AI v6.6 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v6.7 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v6.6:
-#  - Memperbaiki URL gambar dari Google Drive ke format link langsung yang
-#    lebih andal (`uc?export=view`) untuk memastikan pemuatan gambar yang konsisten.
-#  - Menambahkan komentar yang lebih jelas mengenai pengaturan izin di Google Drive.
+#  Pembaruan v6.7:
+#  - Mengubah metode pemuatan gambar dari URL Google Drive kembali ke file lokal.
+#  - Aplikasi sekarang akan membaca 'SMAPER.png' dan 'paper.jfif' langsung
+#    dari repositori GitHub, sesuai dengan struktur file yang baru.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -21,9 +21,16 @@ import os
 import base64
 
 # --- 2. Konfigurasi Halaman & Desain (CSS) ---
-# --- CATATAN PENTING: Pastikan file gambar di Google Drive diatur ke "Anyone with the link" ---
-page_icon_url = "https://drive.google.com/uc?export=view&id=1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
-st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon=page_icon_url)
+# --- PERUBAHAN: Membaca ikon halaman dari file lokal ---
+st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon="SMAPER.png")
+
+# --- PERUBAHAN: Fungsi untuk mengubah gambar menjadi base64 untuk ditampilkan di HTML ---
+def get_base64_of_bin_file(bin_file):
+    if os.path.exists(bin_file):
+        with open(bin_file, 'rb') as f:
+            data = f.read()
+        return base64.b64encode(data).decode()
+    return ""
 
 # CSS Kustom untuk tampilan dan nuansa aplikasi
 CUSTOM_CSS = """
@@ -272,15 +279,14 @@ if 'step' not in st.session_state:
 
 # --- Fungsi Render Halaman ---
 def render_header():
-    # --- PERBAIKAN DI SINI: Menggunakan format URL Google Drive yang lebih andal ---
-    # CATATAN PENTING: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
-    # Klik kanan pada file di Google Drive -> Share -> Share -> General access -> Anyone with the link.
-    logo_url = "https://drive.google.com/uc?export=view&id=1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
+    # --- PERUBAHAN: Membaca logo dari file lokal dan mengubahnya menjadi base64 ---
+    logo_path = "SMAPER.png"
+    logo_base64 = get_base64_of_bin_file(logo_path)
     
     st.markdown(f"""
     <div class="header">
         <div class="logo">
-            <img src="{logo_url}">
+            <img src="data:image/png;base64,{logo_base64}">
             <span class="title">SMARTPAPER.AI</span>
         </div>
     </div>
@@ -378,8 +384,8 @@ with col1:
         render_analysis_page()
 
 with col2:
-    # --- PERBAIKAN DI SINI: Menggunakan format URL Google Drive yang lebih andal ---
-    # CATATAN PENTING: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
-    # Klik kanan pada file di Google Drive -> Share -> Share -> General access -> Anyone with the link.
-    image_url = "https://drive.google.com/uc?export=view&id=1_A-aYV4N7gY9o4vT5xVz-g-ZqQJ9W3bB"
-    st.image(image_url)
+    # --- PERUBAHAN: Membaca gambar dari file lokal ---
+    image_path = "paper.jfif"
+    if os.path.exists(image_path):
+        st.image(image_path)
+
