@@ -1,10 +1,11 @@
 # ==============================================================================
-#  SMARTPAPER.AI v7.3 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v7.4 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v7.3 (Finalisasi Keamanan):
-#  - Menghapus total semua logika fallback dan pesan peringatan (warning).
-#  - Aplikasi sekarang secara eksklusif dan hanya menggunakan st.secrets.
+#  Pembaruan v7.4 (Penghapusan Peringatan):
+#  - Menghapus pesan peringatan (warning) saat kunci API tidak ditemukan.
+#  - Aplikasi akan secara diam-diam menggunakan kunci statis sebagai fallback
+#    jika st.secrets tidak dikonfigurasi.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -173,18 +174,26 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 # --- Fungsi Inti ---
 @st.cache_resource
 def get_llm():
-    # --- Metode Aman dan Final untuk Kunci API ---
+    # --- Metode Pengambilan Kunci API dengan Fallback Senyap ---
+    groq_api_key = ""
     try:
-        # Aplikasi HANYA akan mencoba mengambil kunci API dari Streamlit Secrets.
-        # Ini adalah cara yang benar dan aman untuk deployment.
+        # Prioritas utama: coba ambil dari st.secrets (aman untuk deployment)
         groq_api_key = st.secrets["GROQ_API_KEY"]
-        return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
     except (KeyError, FileNotFoundError):
-        # Pesan error ini akan muncul jika kunci belum diatur di Streamlit Cloud.
-        st.error("Kunci API Groq tidak ditemukan. Harap atur 'GROQ_API_KEY' di bagian Secrets pada pengaturan aplikasi Streamlit Anda.")
+        # Fallback: jika secrets tidak ada, gunakan kunci statis secara diam-diam.
+        # Tidak ada pesan warning yang akan ditampilkan ke pengguna.
+        groq_api_key = "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"
+
+    if not groq_api_key:
+        # Jika tidak ada kunci sama sekali, tampilkan error.
+        st.error("Kunci API Groq tidak tersedia. Harap atur di Streamlit Secrets atau hardcode dalam skrip.")
         return None
+
+    try:
+        return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
     except Exception as e:
-        st.error(f"Gagal memuat model AI. Pastikan API Key Anda valid. Error: {e}")
+        # Jika kunci ada tapi tidak valid, tampilkan error.
+        st.error(f"Gagal memuat model AI dengan kunci yang diberikan. Error: {e}")
         return None
 
 
