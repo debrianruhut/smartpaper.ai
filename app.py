@@ -1,3 +1,16 @@
+# ==============================================================================
+#  SMARTPAPER.AI v6.1 (Global Authority / UN Inspired Theme)
+#  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
+#
+#  Pembaruan v6.1:
+#  - Menambahkan input untuk Nama, Instansi, dan Alamat Email.
+#  - Memperbaiki gaya (CSS) untuk input field agar selalu terlihat jelas
+#    dengan latar belakang putih dan teks hitam.
+#  - Desain Ulang Total: Mengadopsi layout website profesional yang bersih,
+#    terang, dan berwibawa dengan palet warna resmi (Putih, Hitam, Biru PBB).
+#  - Struktur Website Penuh: Header, content area, dan layout full-width.
+#  - Tipografi & Kontras Maksimal untuk keterbacaan dan kejelasan.
+# ==============================================================================
 
 # --- 1. Impor Library ---
 import streamlit as st
@@ -12,10 +25,8 @@ import os
 import base64
 
 # --- 2. Konfigurasi Halaman & Desain (CSS) ---
-# Membaca ikon halaman dari file lokal
 st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon="SMAPER.png")
 
-# Fungsi untuk mengubah gambar menjadi base64 untuk ditampilkan di HTML
 def get_base64_of_bin_file(bin_file):
     if os.path.exists(bin_file):
         with open(bin_file, 'rb') as f:
@@ -70,7 +81,7 @@ CUSTOM_CSS = """
         margin-bottom: 3rem;
     }
     
-    /* --- INPUT FIELDS --- */
+    /* --- INPUT FIELDS (PERUBAHAN DI SINI) --- */
     .stTextInput label {
         font-weight: 600;
         color: #000000 !important;
@@ -109,55 +120,6 @@ CUSTOM_CSS = """
         border-radius: 12px;
         box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
     }
-
-    /* --- GAYA UNTUK RADIO BUTTON & FILE UPLOADER --- */
-    /* Radio Buttons */
-    .stRadio > div {
-        flex-direction: row;
-        gap: 10px;
-    }
-    .stRadio label {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 8px 20px;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        background-color: #f8f9fa; /* Warna default abu-abu muda */
-    }
-    .stRadio > div > label:has(input:checked) {
-        background-color: #009EDB; /* Warna biru saat dipilih */
-        color: white !important;
-        border-color: #009EDB;
-    }
-    .stRadio > div > label:not(:has(input:checked)):hover {
-        background-color: #e9ecef; /* Efek hover */
-        border-color: #adb5bd;
-    }
-
-    /* File Uploader */
-    [data-testid="stFileUploader"] {
-        border: 2px dashed #009EDB;
-        background-color: rgba(0, 158, 219, 0.05); /* Warna biru sangat terang */
-        border-radius: 12px;
-        padding: 2rem;
-    }
-    [data-testid="stFileUploader"] p, [data-testid="stFileUploader"] small {
-        color: #000000;
-    }
-    [data-testid="stFileUploader"] button {
-        background-color: #343a40;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        transition: all 0.2s ease;
-    }
-    [data-testid="stFileUploader"] button:hover {
-        background-color: #495057;
-    }
 </style>
 """
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
@@ -165,22 +127,12 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 # --- Fungsi Inti ---
 @st.cache_resource
 def get_llm():
-    # --- PERINGATAN KEAMANAN ---
-    # Kunci API dimasukkan langsung di sini sesuai permintaan untuk fungsionalitas segera.
-    # SANGAT DISARANKAN untuk memindahkan kunci ini ke Streamlit Secrets
-    # sebelum membagikan atau men-deploy aplikasi ini untuk menghindari penyalahgunaan.
-    # Cara yang aman: groq_api_key = st.secrets["GROQ_API_KEY"]
     try:
-        groq_api_key = "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"
-        if not groq_api_key:
-            st.error("Kunci API Groq tidak disediakan. Aplikasi tidak dapat berfungsi.")
-            return None
+        groq_api_key = st.secrets["GROQ_API_KEY"]
         return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
-    except Exception as e:
-        # Menangkap error lain, misalnya jika kunci tidak valid.
-        st.error(f"Gagal memuat model AI. Pastikan API Key Anda valid. Error: {e}")
+    except Exception:
+        st.error("Gagal memuat model AI. Pastikan GROQ_API_KEY Anda sudah benar.")
         return None
-
 
 def extract_text(source, source_type):
     if source_type == 'file':
@@ -196,40 +148,13 @@ def extract_text(source, source_type):
             except Exception as e: return [f"Error DOCX: {e}"]
     elif source_type == 'url':
         try:
-            # Mengubah link Google Drive menjadi link download langsung jika terdeteksi
-            if "drive.google.com" in source:
-                file_id = source.split('/d/')[1].split('/')[0]
-                source = f'https://drive.google.com/uc?export=download&id={file_id}'
-
             headers = {'User-Agent': 'Mozilla/5.0'}
             response = requests.get(source, headers=headers, timeout=20)
             response.raise_for_status()
-            
-            # Jika sumbernya adalah URL Google Drive, kita perlu menyimpannya sementara
-            # karena PyPDF2/python-docx tidak bisa membaca langsung dari stream respons web
-            temp_file_path = "temp_downloaded_file"
-            with open(temp_file_path, "wb") as f:
-                f.write(response.content)
-            
-            # Cek tipe file dari header atau coba tebak dari URL
-            content_type = response.headers.get('content-type', '').lower()
-            if 'pdf' in content_type or temp_file_path.endswith('.pdf'):
-                 with open(temp_file_path, "rb") as f:
-                    reader = PyPDF2.PdfReader(f)
-                    return [page.extract_text() for page in reader.pages if page.extract_text()]
-            elif 'word' in content_type or temp_file_path.endswith('.docx'):
-                 with open(temp_file_path, "rb") as f:
-                    doc = DocxDocument(f)
-                    return ["\n".join([para.text for para in doc.paragraphs])]
-            else: # Fallback ke BeautifulSoup untuk URL non-dokumen
-                soup = BeautifulSoup(response.content, 'html.parser')
-                for element in soup(["script", "style", "nav", "footer", "header"]): element.decompose()
-                return [soup.get_text(separator='\n', strip=True)]
-
+            soup = BeautifulSoup(response.content, 'html.parser')
+            for element in soup(["script", "style", "nav", "footer", "header"]): element.decompose()
+            return [soup.get_text(separator='\n', strip=True)]
         except requests.RequestException as e: return [f"Error URL: {e}"]
-        finally:
-            if os.path.exists("temp_downloaded_file"):
-                os.remove("temp_downloaded_file") # Hapus file sementara
     return None
 
 def generate_summary(text_content, page_num=None):
@@ -268,19 +193,18 @@ def answer_question(document_pages, question):
         chain = prompt | llm
         return chain.invoke({"context": full_context[:12000], "question": question}).content
 
-# --- Inisialisasi Session State ---
+# --- Inisialisasi Session State (PERUBAHAN DI SINI) ---
 if 'step' not in st.session_state:
     st.session_state.step = "welcome"
     st.session_state.user_name = ""
-    st.session_state.user_institution = ""
-    st.session_state.user_email = ""
+    st.session_state.user_institution = "" # Ditambahkan
+    st.session_state.user_email = "" # Ditambahkan
     st.session_state.document_pages = []
     st.session_state.summary = ""
     st.session_state.chat_messages = []
 
 # --- Fungsi Render Halaman ---
 def render_header():
-    # --- PERUBAHAN: Membaca logo dari file lokal dan mengubahnya menjadi base64 ---
     logo_path = "SMAPER.png"
     logo_base64 = get_base64_of_bin_file(logo_path)
     
@@ -293,6 +217,7 @@ def render_header():
     </div>
     """, unsafe_allow_html=True)
 
+# --- PERUBAHAN DI SINI: Formulir diperbarui ---
 def render_welcome_page():
     st.markdown("<h1>From full papers to focused insights — instantly.</h1>", unsafe_allow_html=True)
     st.markdown("<p class='tagline'>Ubah dokumen penelitian, laporan, atau artikel yang panjang menjadi ringkasan yang mudah dipahami. Dapatkan wawasan kunci dalam hitungan detik, bukan jam.</p>", unsafe_allow_html=True)
@@ -323,7 +248,7 @@ def render_input_source_page():
     if source_type == "Upload File":
         paper_source = st.file_uploader("Pilih file (.pdf, .docx)", type=['pdf', 'docx'], label_visibility="collapsed")
     else:
-        paper_source = st.text_input("Tempelkan link URL", placeholder="https://contoh.com/artikel atau link Google Drive", label_visibility="collapsed")
+        paper_source = st.text_input("Tempelkan link URL", placeholder="https://contoh.com/artikel.pdf", label_visibility="collapsed")
 
     if st.button("Analisa Paper Sekarang", type="primary", use_container_width=True):
         if paper_source:
@@ -331,7 +256,7 @@ def render_input_source_page():
                 source_type_arg = 'file' if source_type == "Upload File" else 'url'
                 pages = extract_text(paper_source, source_type_arg)
                 
-                if pages and not (isinstance(pages, list) and pages[0].startswith("Error")):
+                if pages and not pages[0].startswith("Error"):
                     st.session_state.document_pages = pages
                     st.session_state.summary = generate_summary("\n".join(pages))
                     st.session_state.step = "analysis"
@@ -385,7 +310,6 @@ with col1:
         render_analysis_page()
 
 with col2:
-    # --- PERUBAHAN: Membaca gambar dari file lokal ---
     image_path = "paper.jfif"
     if os.path.exists(image_path):
         st.image(image_path)
