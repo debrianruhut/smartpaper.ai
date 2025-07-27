@@ -1,3 +1,12 @@
+# ==============================================================================
+#  SMARTPAPER.AI v7.6 (Global Authority / UN Inspired Theme)
+#  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
+#
+#  Pembaruan v7.6 (Permintaan Pengguna):
+#  - Menggunakan kunci API statis secara langsung untuk fungsionalitas segera.
+#  - Menghapus ketergantungan pada st.secrets sesuai permintaan.
+#  - PERINGATAN: Metode ini tidak aman untuk produksi/publik.
+# ==============================================================================
 
 # --- 1. Impor Library ---
 import streamlit as st
@@ -165,17 +174,17 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 # --- Fungsi Inti ---
 @st.cache_resource
 def get_llm():
-    # --- Metode Aman dan Final untuk Kunci API ---
+    # --- PERINGATAN KEAMANAN ---
+    # Kunci API dimasukkan langsung di sini sesuai permintaan untuk fungsionalitas segera.
+    # SANGAT DISARANKAN untuk memindahkan kunci ini ke Streamlit Secrets
+    # sebelum membagikan atau men-deploy aplikasi ini untuk menghindari penyalahgunaan.
+    # Cara yang aman: groq_api_key = st.secrets["GROQ_API_KEY"]
     try:
-        # Aplikasi HANYA akan mencoba mengambil kunci API dari Streamlit Secrets.
-        # Ini adalah cara yang benar dan aman untuk deployment.
-        groq_api_key = st.secrets["GROQ_API_KEY"]
+        groq_api_key = "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"
+        if not groq_api_key:
+            st.error("Kunci API Groq tidak disediakan. Aplikasi tidak dapat berfungsi.")
+            return None
         return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
-    except (KeyError, FileNotFoundError):
-        # Pesan error ini akan muncul jika kunci belum diatur di Streamlit Cloud.
-        # Tidak ada lagi pesan peringatan (warning) atau fallback.
-        st.error("Kunci API Groq tidak ditemukan. Harap atur 'GROQ_API_KEY' di bagian Secrets pada pengaturan aplikasi Streamlit Anda.")
-        return None
     except Exception as e:
         # Menangkap error lain, misalnya jika kunci tidak valid.
         st.error(f"Gagal memuat model AI. Pastikan API Key Anda valid. Error: {e}")
