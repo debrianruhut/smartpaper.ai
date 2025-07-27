@@ -1,11 +1,11 @@
 # ==============================================================================
-#  SMARTPAPER.AI v6.7 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v6.9 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v6.7:
-#  - Mengubah metode pemuatan gambar dari URL Google Drive kembali ke file lokal.
-#  - Aplikasi sekarang akan membaca 'SMAPER.png' dan 'paper.jfif' langsung
-#    dari repositori GitHub, sesuai dengan struktur file yang baru.
+#  Pembaruan v6.9 (Perbaikan Keamanan):
+#  - Menghapus kunci API statis dari dalam kode untuk mengatasi risiko keamanan.
+#  - Mengembalikan metode pengambilan kunci API ke st.secrets, yang merupakan
+#    praktik terbaik dan aman untuk deployment.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -21,10 +21,10 @@ import os
 import base64
 
 # --- 2. Konfigurasi Halaman & Desain (CSS) ---
-# --- PERUBAHAN: Membaca ikon halaman dari file lokal ---
+# Membaca ikon halaman dari file lokal
 st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon="SMAPER.png")
 
-# --- PERUBAHAN: Fungsi untuk mengubah gambar menjadi base64 untuk ditampilkan di HTML ---
+# Fungsi untuk mengubah gambar menjadi base64 untuk ditampilkan di HTML
 def get_base64_of_bin_file(bin_file):
     if os.path.exists(bin_file):
         with open(bin_file, 'rb') as f:
@@ -175,10 +175,11 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 @st.cache_resource
 def get_llm():
     try:
+        # --- PERBAIKAN: Mengembalikan ke metode aman menggunakan st.secrets ---
         groq_api_key = st.secrets["GROQ_API_KEY"]
         return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
-    except Exception:
-        st.error("Gagal memuat model AI. Pastikan GROQ_API_KEY Anda sudah benar.")
+    except Exception as e:
+        st.error(f"Gagal memuat model AI. Pastikan Anda telah mengatur GROQ_API_KEY di Streamlit Secrets. Error: {e}")
         return None
 
 def extract_text(source, source_type):
@@ -388,4 +389,3 @@ with col2:
     image_path = "paper.jfif"
     if os.path.exists(image_path):
         st.image(image_path)
-
