@@ -1,11 +1,11 @@
 # ==============================================================================
-#  SMARTPAPER.AI v6.5 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v6.6 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v6.5:
+#  Pembaruan v6.6:
 #  - Memperbaiki URL gambar dari Google Drive ke format link langsung yang
-#    lebih andal untuk memastikan logo dan gambar sampingan dapat dimuat
-#    dengan benar di aplikasi.
+#    lebih andal (`uc?export=view`) untuk memastikan pemuatan gambar yang konsisten.
+#  - Menambahkan komentar yang lebih jelas mengenai pengaturan izin di Google Drive.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -22,7 +22,7 @@ import base64
 
 # --- 2. Konfigurasi Halaman & Desain (CSS) ---
 # --- CATATAN PENTING: Pastikan file gambar di Google Drive diatur ke "Anyone with the link" ---
-page_icon_url = "https://lh3.googleusercontent.com/d/1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
+page_icon_url = "https://drive.google.com/uc?export=view&id=1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
 st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon=page_icon_url)
 
 # CSS Kustom untuk tampilan dan nuansa aplikasi
@@ -273,8 +273,9 @@ if 'step' not in st.session_state:
 # --- Fungsi Render Halaman ---
 def render_header():
     # --- PERBAIKAN DI SINI: Menggunakan format URL Google Drive yang lebih andal ---
-    # CATATAN: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
-    logo_url = "https://lh3.googleusercontent.com/d/1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
+    # CATATAN PENTING: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
+    # Klik kanan pada file di Google Drive -> Share -> Share -> General access -> Anyone with the link.
+    logo_url = "https://drive.google.com/uc?export=view&id=1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
     
     st.markdown(f"""
     <div class="header">
@@ -378,6 +379,7 @@ with col1:
 
 with col2:
     # --- PERBAIKAN DI SINI: Menggunakan format URL Google Drive yang lebih andal ---
-    # CATATAN: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
-    image_url = "https://lh3.googleusercontent.com/d/1_A-aYV4N7gY9o4vT5xVz-g-ZqQJ9W3bB"
+    # CATATAN PENTING: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
+    # Klik kanan pada file di Google Drive -> Share -> Share -> General access -> Anyone with the link.
+    image_url = "https://drive.google.com/uc?export=view&id=1_A-aYV4N7gY9o4vT5xVz-g-ZqQJ9W3bB"
     st.image(image_url)
