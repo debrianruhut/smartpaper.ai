@@ -1,12 +1,4 @@
-# ==============================================================================
-#  SMARTPAPER.AI v7.6 (Global Authority / UN Inspired Theme)
-#  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
-#
-#  Pembaruan v7.6 (Permintaan Pengguna):
-#  - Menggunakan kunci API statis secara langsung untuk fungsionalitas segera.
-#  - Menghapus ketergantungan pada st.secrets sesuai permintaan.
-#  - PERINGATAN: Metode ini tidak aman untuk produksi/publik.
-# ==============================================================================
+
 
 # --- 1. Impor Library ---
 import streamlit as st
@@ -381,6 +373,18 @@ def render_analysis_page():
         st.session_state.chat_messages = []
         st.rerun()
 
+# --- PERUBAHAN: Fungsi untuk render footer ---
+def render_footer():
+    st.markdown("---")
+    st.markdown(
+        """
+        <div style="text-align: center; padding-top: 20px; color: #808080;">
+            Apps ini dibuat oleh <a href="https://www.linkedin.com/in/shella-theresya-pandiangan-7a53731b7/" target="_blank" style="color: #009EDB; text-decoration: none;">Shella Theresya Pandiangan</a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 # --- Router Utama Aplikasi ---
 render_header()
 col1, col2 = st.columns([0.6, 0.4], gap="large")
@@ -398,3 +402,6 @@ with col2:
     image_path = "paper.jfif"
     if os.path.exists(image_path):
         st.image(image_path)
+
+# --- PERUBAHAN: Memanggil fungsi footer di akhir ---
+render_footer()
