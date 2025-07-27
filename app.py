@@ -1,12 +1,3 @@
-# ==============================================================================
-#  SMARTPAPER.AI v7.4 (Global Authority / UN Inspired Theme)
-#  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
-#
-#  Pembaruan v7.4 (Penghapusan Peringatan):
-#  - Menghapus pesan peringatan (warning) saat kunci API tidak ditemukan.
-#  - Aplikasi akan secara diam-diam menggunakan kunci statis sebagai fallback
-#    jika st.secrets tidak dikonfigurasi.
-# ==============================================================================
 
 # --- 1. Impor Library ---
 import streamlit as st
@@ -174,26 +165,20 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 # --- Fungsi Inti ---
 @st.cache_resource
 def get_llm():
-    # --- Metode Pengambilan Kunci API dengan Fallback Senyap ---
-    groq_api_key = ""
+    # --- Metode Aman dan Final untuk Kunci API ---
     try:
-        # Prioritas utama: coba ambil dari st.secrets (aman untuk deployment)
+        # Aplikasi HANYA akan mencoba mengambil kunci API dari Streamlit Secrets.
+        # Ini adalah cara yang benar dan aman untuk deployment.
         groq_api_key = st.secrets["GROQ_API_KEY"]
-    except (KeyError, FileNotFoundError):
-        # Fallback: jika secrets tidak ada, gunakan kunci statis secara diam-diam.
-        # Tidak ada pesan warning yang akan ditampilkan ke pengguna.
-        groq_api_key = "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"
-
-    if not groq_api_key:
-        # Jika tidak ada kunci sama sekali, tampilkan error.
-        st.error("Kunci API Groq tidak tersedia. Harap atur di Streamlit Secrets atau hardcode dalam skrip.")
-        return None
-
-    try:
         return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
+    except (KeyError, FileNotFoundError):
+        # Pesan error ini akan muncul jika kunci belum diatur di Streamlit Cloud.
+        # Tidak ada lagi pesan peringatan (warning) atau fallback.
+        st.error("Kunci API Groq tidak ditemukan. Harap atur 'GROQ_API_KEY' di bagian Secrets pada pengaturan aplikasi Streamlit Anda.")
+        return None
     except Exception as e:
-        # Jika kunci ada tapi tidak valid, tampilkan error.
-        st.error(f"Gagal memuat model AI dengan kunci yang diberikan. Error: {e}")
+        # Menangkap error lain, misalnya jika kunci tidak valid.
+        st.error(f"Gagal memuat model AI. Pastikan API Key Anda valid. Error: {e}")
         return None
 
 
