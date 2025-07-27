@@ -1,11 +1,12 @@
 # ==============================================================================
-#  SMARTPAPER.AI v6.9 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v7.0 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v6.9 (Perbaikan Keamanan):
-#  - Menghapus kunci API statis dari dalam kode untuk mengatasi risiko keamanan.
-#  - Mengembalikan metode pengambilan kunci API ke st.secrets, yang merupakan
-#    praktik terbaik dan aman untuk deployment.
+#  Pembaruan v7.0 (Perbaikan Fungsionalitas):
+#  - Menambahkan mekanisme fallback untuk kunci API.
+#  - Aplikasi akan mencoba st.secrets terlebih dahulu, lalu menggunakan kunci
+#    statis jika secrets tidak tersedia, memastikan fungsionalitas
+#    baik saat deployment maupun lokal.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -174,13 +175,21 @@ st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 # --- Fungsi Inti ---
 @st.cache_resource
 def get_llm():
+    # --- PERBAIKAN: Menambahkan fallback untuk API Key ---
     try:
-        # --- PERBAIKAN: Mengembalikan ke metode aman menggunakan st.secrets ---
+        # Coba ambil dari st.secrets terlebih dahulu (untuk deployment)
         groq_api_key = st.secrets["GROQ_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        # Jika gagal, gunakan kunci statis sebagai fallback (untuk pengembangan lokal)
+        st.warning("GROQ_API_KEY tidak ditemukan di Streamlit Secrets. Menggunakan kunci statis sebagai fallback.")
+        groq_api_key = "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"
+
+    try:
         return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
     except Exception as e:
-        st.error(f"Gagal memuat model AI. Pastikan Anda telah mengatur GROQ_API_KEY di Streamlit Secrets. Error: {e}")
+        st.error(f"Gagal memuat model AI. Pastikan API Key Anda valid. Error: {e}")
         return None
+
 
 def extract_text(source, source_type):
     if source_type == 'file':
