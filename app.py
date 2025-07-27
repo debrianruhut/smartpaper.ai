@@ -1,11 +1,11 @@
 # ==============================================================================
-#  SMARTPAPER.AI v6.3 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v6.5 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v6.3:
-#  - Mengubah sumber gambar dari URL GitHub/lokal menjadi URL langsung
-#    dari Google Drive, sesuai permintaan pengguna.
-#  - URL telah dikonversi ke format yang dapat disematkan langsung.
+#  Pembaruan v6.5:
+#  - Memperbaiki URL gambar dari Google Drive ke format link langsung yang
+#    lebih andal untuk memastikan logo dan gambar sampingan dapat dimuat
+#    dengan benar di aplikasi.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -21,7 +21,9 @@ import os
 import base64
 
 # --- 2. Konfigurasi Halaman & Desain (CSS) ---
-st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon="https://drive.google.com/uc?export=view&id=1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY")
+# --- CATATAN PENTING: Pastikan file gambar di Google Drive diatur ke "Anyone with the link" ---
+page_icon_url = "https://lh3.googleusercontent.com/d/1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
+st.set_page_config(page_title="SMARTPAPER.AI", layout="wide", page_icon=page_icon_url)
 
 # CSS Kustom untuk tampilan dan nuansa aplikasi
 CUSTOM_CSS = """
@@ -108,6 +110,55 @@ CUSTOM_CSS = """
     [data-testid="column"]:has(img) img {
         border-radius: 12px;
         box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
+    }
+
+    /* --- GAYA UNTUK RADIO BUTTON & FILE UPLOADER --- */
+    /* Radio Buttons */
+    .stRadio > div {
+        flex-direction: row;
+        gap: 10px;
+    }
+    .stRadio label {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        background-color: #f8f9fa; /* Warna default abu-abu muda */
+    }
+    .stRadio > div > label:has(input:checked) {
+        background-color: #009EDB; /* Warna biru saat dipilih */
+        color: white !important;
+        border-color: #009EDB;
+    }
+    .stRadio > div > label:not(:has(input:checked)):hover {
+        background-color: #e9ecef; /* Efek hover */
+        border-color: #adb5bd;
+    }
+
+    /* File Uploader */
+    [data-testid="stFileUploader"] {
+        border: 2px dashed #009EDB;
+        background-color: rgba(0, 158, 219, 0.05); /* Warna biru sangat terang */
+        border-radius: 12px;
+        padding: 2rem;
+    }
+    [data-testid="stFileUploader"] p, [data-testid="stFileUploader"] small {
+        color: #000000;
+    }
+    [data-testid="stFileUploader"] button {
+        background-color: #343a40;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: all 0.2s ease;
+    }
+    [data-testid="stFileUploader"] button:hover {
+        background-color: #495057;
     }
 </style>
 """
@@ -221,8 +272,9 @@ if 'step' not in st.session_state:
 
 # --- Fungsi Render Halaman ---
 def render_header():
-    # --- PERUBAHAN DI SINI: Menggunakan URL gambar langsung dari Google Drive ---
-    logo_url = "https://drive.google.com/uc?export=view&id=1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
+    # --- PERBAIKAN DI SINI: Menggunakan format URL Google Drive yang lebih andal ---
+    # CATATAN: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
+    logo_url = "https://lh3.googleusercontent.com/d/1_BwE5n9yJ8xR9kL8H-rK-o-Y8tJ7c6sY"
     
     st.markdown(f"""
     <div class="header">
@@ -325,6 +377,7 @@ with col1:
         render_analysis_page()
 
 with col2:
-    # --- PERUBAHAN DI SINI: Menggunakan URL gambar langsung dari Google Drive ---
-    image_url = "https://drive.google.com/uc?export=view&id=1_A-aYV4N7gY9o4vT5xVz-g-ZqQJ9W3bB"
+    # --- PERBAIKAN DI SINI: Menggunakan format URL Google Drive yang lebih andal ---
+    # CATATAN: Pastikan file di Google Drive diatur ke "Anyone with the link can view".
+    image_url = "https://lh3.googleusercontent.com/d/1_A-aYV4N7gY9o4vT5xVz-g-ZqQJ9W3bB"
     st.image(image_url)
