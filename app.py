@@ -1,11 +1,10 @@
 # ==============================================================================
-#  SMARTPAPER.AI v7.2 (Global Authority / UN Inspired Theme)
+#  SMARTPAPER.AI v7.3 (Global Authority / UN Inspired Theme)
 #  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
 #
-#  Pembaruan v7.2 (Penyempurnaan Keamanan):
-#  - Menghapus semua referensi ke kunci API statis dan pesan peringatan (warning).
-#  - Aplikasi sekarang secara eksklusif menggunakan st.secrets, menampilkan pesan
-#    error yang jelas jika kunci tidak dikonfigurasi dengan benar.
+#  Pembaruan v7.3 (Finalisasi Keamanan):
+#  - Menghapus total semua logika fallback dan pesan peringatan (warning).
+#  - Aplikasi sekarang secara eksklusif dan hanya menggunakan st.secrets.
 # ==============================================================================
 
 # --- 1. Impor Library ---
@@ -182,7 +181,6 @@ def get_llm():
         return ChatGroq(temperature=0, model_name="llama3-8b-8192", api_key=groq_api_key)
     except (KeyError, FileNotFoundError):
         # Pesan error ini akan muncul jika kunci belum diatur di Streamlit Cloud.
-        # Tidak ada lagi pesan peringatan (warning).
         st.error("Kunci API Groq tidak ditemukan. Harap atur 'GROQ_API_KEY' di bagian Secrets pada pengaturan aplikasi Streamlit Anda.")
         return None
     except Exception as e:
