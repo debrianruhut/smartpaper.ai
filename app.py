@@ -1,12 +1,3 @@
-# ==============================================================================
-#  SMARTPAPER.AI v7.6 (Global Authority / UN Inspired Theme)
-#  UI/UX & Code by Gemini, fulfilling the vision of PT. Bukit Technology
-#
-#  Pembaruan v7.6 (Permintaan Pengguna):
-#  - Menggunakan kunci API statis secara langsung untuk fungsionalitas segera.
-#  - Menghapus ketergantungan pada st.secrets sesuai permintaan.
-#  - PERINGATAN: Metode ini tidak aman untuk produksi/publik.
-# ==============================================================================
 
 # --- 1. Impor Library ---
 import streamlit as st
